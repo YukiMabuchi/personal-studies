@@ -1,2 +1,4 @@
 reference/
 .env
+langchain/src/
+langchain/tmp/

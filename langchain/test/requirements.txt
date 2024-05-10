@@ -1,6 +1,4 @@
-# python3 -m pip install -r ~/dev/study/langchain/requirements.txt
 python-dotenv
-
 langchain
 langchain-openai
 pymupdf
