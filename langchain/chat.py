@@ -46,6 +46,17 @@ retriever = vectorstore.as_retriever(search_type="similarity")
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
+"""
+LCEL Runnable protocol
+https://python.langchain.com/v0.1/docs/expression_language/
+
+The Runnable executes the pipeline of operations calling invoke method on each
+それぞれのクラスの中にinvoke methodがある、それを次々につぎつぎに呼び出している
+
+RunnablePassthrough
+https://api.python.langchain.com/en/latest/runnables/langchain_core.runnables.passthrough.RunnablePassthrough.html
+originalのinputを保持する
+"""
 rag_chain = (
     {"context": retriever | format_docs, "q": RunnablePassthrough()}
     | custom_rag_prompt
