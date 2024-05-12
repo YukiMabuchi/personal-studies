@@ -75,11 +75,25 @@ rag_chain_with_source = RunnableParallel(
     {"context": retriever, "q": RunnablePassthrough()}
 ).assign(answer=rag_chain_from_docs)
 
-res = rag_chain_with_source.invoke(q)
+output = {}
+curr_key = None
+keys = ['q', 'context', 'answer']
+for chunk in rag_chain_with_source.stream(q): # invoke or stream
+    for key in chunk:
+        if key not in keys:
+            continue
 
-output = f"""Question: {res.get('q')}
-Answer: {res.get('answer')}
-Reference: {", ".join(list(set([r and r.metadata and r.metadata.get("file_path") or '' for r in res.get('context', [])])))}
-"""
+        curr_val = output.get(key, '')
+        if key == 'context':
+            src = ", ".join(list(set([r and r.metadata and r.metadata.get("file_path") or '' for r in chunk[key]])))
+            output[key] = curr_val+src
+        else:
+            output[key] = curr_val+chunk[key]
 
-print(output)
+        stream_data = chunk[key] if key == 'answer' else output[key]
+
+        if key != curr_key:
+            print(f"\n\n{key}: {stream_data}", end="", flush=True)
+        else:
+            print(stream_data, end="", flush=True)
+        curr_key = key
