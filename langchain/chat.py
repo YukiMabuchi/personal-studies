@@ -11,6 +11,7 @@ from langchain_chroma import Chroma
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnableParallel
 
 load_dotenv()
 
@@ -57,13 +58,28 @@ RunnablePassthrough
 https://api.python.langchain.com/en/latest/runnables/langchain_core.runnables.passthrough.RunnablePassthrough.html
 originalのinputを保持する
 """
-rag_chain = (
-    {"context": retriever | format_docs, "q": RunnablePassthrough()}
+rag_chain_from_docs = (
+    RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
     | custom_rag_prompt
     | llm
     | StrOutputParser()
 )
 
-res = rag_chain.invoke(q)
+"""
+RunnableParallel
+https://api.python.langchain.com/en/latest/runnables/langchain_core.runnables.base.RunnableParallel.html
+It invokes Runnables concurrently, providing the same input to each.
+Streamとかに使えそう
+"""
+rag_chain_with_source = RunnableParallel(
+    {"context": retriever, "q": RunnablePassthrough()}
+).assign(answer=rag_chain_from_docs)
 
-print(f"Result: {res}")
+res = rag_chain_with_source.invoke(q)
+
+output = f"""Question: {res.get('q')}
+Answer: {res.get('answer')}
+Reference: {", ".join(list(set([r and r.metadata and r.metadata.get("file_path") or '' for r in res.get('context', [])])))}
+"""
+
+print(output)
