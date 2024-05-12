@@ -13,7 +13,7 @@ from langchain_community.document_loaders import PyMuPDFLoader # https://python.
 load_dotenv()
 pwd = os.path.dirname(os.path.abspath(__file__))
 
-# first rm all the trained data
+# every time remove the pretrained data first
 # if it's ok to train data in in-memory, we don't need this
 dir_path = f"{pwd}/tmp/data"
 if os.path.exists(dir_path):
@@ -21,24 +21,27 @@ if os.path.exists(dir_path):
     os.makedirs(dir_path)
 
 # training
-loader = PyMuPDFLoader(f"{pwd}/src/pdf/attention_is_all_you_need.pdf") # attention_is_all_you_need.pdf
-docs = loader.load()
-
 embeddings = OpenAIEmbeddings(
     model="text-embedding-3-small"
 )
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
-
 vectorstore = Chroma(
     persist_directory=f"{pwd}/tmp/data",
     embedding_function=embeddings
 )
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
 
-splits = text_splitter.split_documents(docs)
+training_data_path = f"{pwd}/src/pdf"
+file_names = [f for f in os.listdir(training_data_path) if os.path.isfile(os.path.join(training_data_path, f))]
 
-vectorstore.add_documents(
-    documents=splits,
-    embedding=embeddings
-)
+for fn in file_names:
+    loader = PyMuPDFLoader(f"{pwd}/src/pdf/{fn}")
+    docs = loader.load()
+
+    splits = text_splitter.split_documents(docs)
+
+    vectorstore.add_documents(
+        documents=splits,
+        embedding=embeddings
+    )
 
 print('training done')
