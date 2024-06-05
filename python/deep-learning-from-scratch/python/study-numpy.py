@@ -1,5 +1,8 @@
 """
 This file is for studying numpy lib
+
+Datatypes doc:
+https://numpy.org/doc/stable/user/basics.types.html
 """
 
 import numpy as np
