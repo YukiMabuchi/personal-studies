@@ -2,6 +2,7 @@
 DOC: https://docs.python.org/3/library/unittest.html
 
 unittest.TestCaseを継承しテストができる
+テスト用関数の名前はtest_から始める
 setUpとtearDownで各テストfunctionが実行される前と後にそれぞれ処理を行える
 @unittest.skipデコレーターでテストをスキップできる
 """
