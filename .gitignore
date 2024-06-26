@@ -4,3 +4,5 @@ langchain/src/
 langchain/tmp/
 
 python/deep-learning-from-scratch/mnist/
+
+.coverage
