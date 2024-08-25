@@ -1,7 +1,7 @@
 """
 DOC: https://docs.pytest.org/en/8.2.x/getting-started.html#get-started
      https://docs.pytest.org/en/8.2.x/how-to/index.html#how-to
-     
+
 python3 -m pytest python/basics/test/pytest_test.py -s
 conftestでoptionを追加するならファイル名の後に
 print結果の出力は-sオプション
@@ -27,14 +27,14 @@ class TestCal(object):
         cls.cal = unittest_.Cal()
         cls.test_dir = '/tmp/test_dir'
         cls.test_file_name = 'test.txt'
-    
+
     @classmethod
     def teardown_class(cls):
         print('end')
         del cls.cal
         if os.path.exists(cls.test_dir):
             shutil.rmtree(cls.test_dir)
-    
+
     def setup_method(self, method):
         print(f'method={method.__name__}')
         # self.cal = unittest_.Cal()
@@ -42,7 +42,7 @@ class TestCal(object):
     def teardown_method(self, method):
         print(f'method={method.__name__}')
         # del self.cal
-    
+
     # @pytest.mark.skip(reason='skip!')
     # @pytest.mark.skipif(version==1, reason='skip!')
     def test_add_num_and_double(self, request):
@@ -54,13 +54,13 @@ class TestCal(object):
     def test_add_num_and_double_raise(self):
         with pytest.raises(ValueError):
             self.cal.add_num_and_double('1', '1')
-    
+
     def test_save(self, tmpdir, csv_file):
         print(csv_file)
         self.cal.save(tmpdir, self.test_file_name)
         test_file_path = os.path.join(tmpdir, self.test_file_name)
         assert os.path.exists(test_file_path) is True
-    
+
     def test_save_no_dir(self):
         self.cal.save(self.test_dir, self.test_file_name)
         test_file_path = os.path.join(self.test_dir, self.test_file_name)
